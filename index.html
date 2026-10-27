@@ -17,30 +17,22 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyAFnuq03djdR_epvgZaPpC1hzEKPRZo-VY",
-            authDomain: "jgtc-map-store.firebaseapp.com",
-            projectId: "jgtc-map-store",
-            storageBucket: "jgtc-map-store.firebasestorage.app",
-            messagingSenderId: "321292000007",
-            appId: "1:321292000007:web:210ad2a87f501eaf6a03a2",
-            measurementId: "G-8R62NZHESF"
+            apiKey: "AIzaSyC94SWhwEYf5w2flPEU819Cq2PEgBxyOW8",
+            authDomain: "jgtc-store.firebaseapp.com",
+            projectId: "jgtc-store",
+            storageBucket: "jgtc-store.firebasestorage.app",
+            messagingSenderId: "108556561336",
+            appId: "1:108556561336:web:d2559085e5288af99d7d4d",
+            measurementId: "G-2RZGYGEFL8"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
 
         window.firebaseDb = db;
-        window.firebaseAuth = auth;
         window.fsMethods = { collection, getDocs, setDoc, doc, deleteDoc, onSnapshot };
-        window.authMethods = { signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword };
-        onAuthStateChanged(auth, (user) => {
-            if (typeof window.syncAdminAuthState === 'function') window.syncAdminAuthState(user);
-            else window.pendingFirebaseUser = user;
-        });
         
         if (window.initStoreApp) {
             window.initStoreApp();
@@ -492,15 +484,15 @@
 
                 <!-- Setting 5: Keamanan -->
                 <div id="adminTabSecurity" class="pt-6 hidden">
-                    <div class="max-w-2xl mb-5 rounded-xl border border-amber-500/40 bg-amber-950/20 p-4 text-xs leading-relaxed text-amber-100">
-                        <strong class="block mb-1">Firebase Authentication aktif pada kode ini</strong>
-                        Login menggunakan akun Email/Password yang dibuat di Firebase Console. Penggantian password di bawah ini mengubah password akun Firebase, bukan password lokal. Untuk melindungi data, Firestore Security Rules tetap harus membatasi akses admin berdasarkan UID.
+                    <div class="max-w-2xl mb-5 rounded-xl border border-red-500/40 bg-red-950/30 p-4 text-xs leading-relaxed text-red-200">
+                        <strong class="block mb-1">Peringatan keamanan penting</strong>
+                        Login dan penggantian password pada file HTML ini hanya berjalan di browser/perangkat ini. Ini bukan autentikasi server dan tidak melindungi Firestore. Sebelum digunakan publik, aktifkan Firebase Authentication dan pasang Firestore Security Rules yang membatasi perubahan data admin. Aturan Firebase belum dapat diverifikasi dari file HTML ini.
                     </div>
                     <form onsubmit="handleSecurityChangePassword(event)" class="space-y-4 max-w-xl">
-                        <h3 class="text-base font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> 5. Keamanan & Ganti Password Firebase</h3>
+                        <h3 class="text-base font-bold text-amber-400"><i class="fa-solid fa-user-shield"></i> 5. Keamanan & Ganti Password Admin (Lokal)</h3>
                         <div>
-                            <label class="block text-xs text-gray-300 mb-1">Password Firebase Baru (minimal 8 karakter)</label>
-                            <input type="password" id="secNewPassword" minlength="8" autocomplete="new-password" required class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 text-white text-sm border border-gray-700">
+                            <label class="block text-xs text-gray-300 mb-1">Kata Sandi Baru</label>
+                            <input type="password" id="secNewPassword" minlength="6" required class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 text-white text-sm border border-gray-700">
                         </div>
                         <button type="submit" class="py-2.5 px-6 rounded-xl bg-emerald-600 text-white font-bold text-sm">Perbarui Password</button>
                     </form>
@@ -751,11 +743,9 @@
         <div class="glass-panel rounded-2xl max-w-sm w-full p-6 border border-amber-500/40 relative text-center">
             <button onclick="closeAdminLoginModal()" class="absolute top-4 right-4 text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
             <h3 class="font-bold text-lg text-white mb-4">Admin Login</h3>
-            <p class="text-xs text-gray-400 mb-4">Masuk menggunakan akun admin Firebase.</p>
             <form onsubmit="handleAdminLogin(event)" class="space-y-4">
-                <input type="email" id="adminEmail" required autocomplete="username" placeholder="Email admin" class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 text-white text-sm border border-gray-700">
-                <input type="password" id="adminPassword" required autocomplete="current-password" placeholder="Password..." class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 text-white text-sm border border-gray-700">
-                <button id="adminLoginSubmit" type="submit" class="w-full py-2.5 rounded-xl bg-amber-500 text-dark-900 font-bold text-sm">Masuk</button>
+                <input type="password" id="adminPassword" required placeholder="Password..." class="w-full px-3.5 py-2.5 rounded-xl bg-dark-900 text-white text-sm border border-gray-700">
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-500 text-dark-900 font-bold text-sm">Masuk</button>
             </form>
         </div>
     </div>
@@ -872,7 +862,7 @@
         <span id="toastMsg">Notifikasi</span>
     </div>
 
-    <!-- SECURITY NOTE: Firebase Authentication is used for sign-in. Firestore Security Rules must still restrict admin data access by UID. -->
+    <!-- SECURITY NOTE: Admin password checks in this standalone HTML are client-side only. They do not secure Firestore. Configure Firebase Authentication and restrictive Firestore Security Rules before production. -->
     <!-- JAVASCRIPT UTAMA -->
     <script>
         let routesData = [], paywareData = [], scenariosData = [], tutorialsData = [], ordersData = [];
@@ -972,6 +962,10 @@
             if (!window.firebaseDb) return;
             const db = window.firebaseDb;
             const { collection, onSnapshot } = window.fsMethods;
+
+            if (!localStorage.getItem('jgtc_owner_pwd_hash')) {
+                localStorage.setItem('jgtc_owner_pwd_hash', await sha256('adminjgtc2026'));
+            }
 
             onSnapshot(collection(db, "routes"), (snapshot) => {
                 routesData = snapshot.empty ? [] : snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1281,17 +1275,13 @@
             e.preventDefault();
             const password = document.getElementById('secNewPassword').value;
             if (password.length < 8) { showToast('Gunakan password minimal 8 karakter.'); return; }
-            const user = window.firebaseAuth && window.firebaseAuth.currentUser;
-            if (!user) { showToast('Sesi login Firebase tidak ditemukan. Silakan login ulang.'); return; }
             try {
-                await window.authMethods.updatePassword(user, password);
+                localStorage.setItem('jgtc_owner_pwd_hash', await sha256(password));
                 document.getElementById('secNewPassword').value = '';
-                showToast('Password akun Firebase berhasil diperbarui.');
+                showToast('Password lokal diperbarui di browser ini. Ini tidak mengamankan Firebase.');
             } catch (error) {
-                console.error('Gagal memperbarui password Firebase:', error);
-                if (error.code === 'auth/requires-recent-login') showToast('Demi keamanan, logout lalu login kembali sebelum mengganti password.');
-                else if (error.code === 'auth/weak-password') showToast('Password terlalu lemah. Gunakan minimal 8 karakter.');
-                else showToast('Password gagal diperbarui: ' + (error.code || 'periksa koneksi Firebase'));
+                console.error('Gagal memperbarui password lokal:', error);
+                showToast('Password gagal diperbarui. Pastikan browser mendukung Web Crypto dan penyimpanan lokal.');
             }
         }
 
@@ -1361,73 +1351,20 @@
 
         async function handleAdminLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value;
-            const submit = document.getElementById('adminLoginSubmit');
-            if (!window.authMethods || !window.firebaseAuth) { showToast('Firebase Authentication belum siap. Muat ulang halaman.'); return; }
-            submit.disabled = true;
-            submit.textContent = 'Memproses...';
-            let loginTimeout;
-            try {
-                await Promise.race([
-                    window.authMethods.signInWithEmailAndPassword(window.firebaseAuth, email, password),
-                    new Promise((_, reject) => {
-                        loginTimeout = setTimeout(() => reject(Object.assign(
-                            new Error('Firebase tidak merespons dalam 15 detik'),
-                            { code: 'auth/timeout' }
-                        )), 15000);
-                    })
-                ]);
-                document.getElementById('adminPassword').value = '';
+            if (await sha256(document.getElementById('adminPassword').value) === localStorage.getItem('jgtc_owner_pwd_hash')) {
+                isAdminLoggedIn = true;
+                // Do not persist a client-controlled login flag.
+                updateAdminUI(true);
                 document.getElementById('adminLoginModal').classList.add('hidden');
-                showToast('Login Firebase berhasil!');
+                showToast("Login Berhasil!");
                 scrollToSection('adminSection');
-            } catch (error) {
-                console.error('Login Firebase gagal:', error);
-                const messages = {
-                    'auth/invalid-email': 'Format email tidak valid.',
-                    'auth/invalid-credential': 'Email atau password salah.',
-                    'auth/user-not-found': 'Akun tidak ditemukan. Buat akun di Firebase Console.',
-                    'auth/wrong-password': 'Email atau password salah.',
-                    'auth/too-many-requests': 'Terlalu banyak percobaan. Coba lagi nanti.',
-                    'auth/network-request-failed': 'Koneksi gagal. Periksa internet lalu coba lagi.',
-                    'auth/operation-not-allowed': 'Login Email/Password belum diaktifkan di Firebase Console.',
-                    'auth/timeout': 'Firebase tidak merespons. Periksa internet, lalu buka file melalui situs web/hosting, bukan alamat content:// di penyimpanan HP.'
-                };
-                showToast(messages[error.code] || ('Login gagal: ' + (error.code || 'periksa pengaturan Firebase')));
-            } finally {
-                clearTimeout(loginTimeout);
-                submit.disabled = false;
-                submit.textContent = 'Masuk';
-            }
+            } else { showToast("Password Salah!"); }
         }
 
         function logoutAdmin() {
-            if (window.authMethods && window.firebaseAuth) {
-                window.authMethods.signOut(window.firebaseAuth).catch(error => {
-                    console.error('Logout Firebase gagal:', error);
-                    showToast('Logout gagal. Coba lagi.');
-                });
-            } else {
-                isAdminLoggedIn = false;
-                updateAdminUI(false);
-            }
-        }
-
-        window.syncAdminAuthState = function(user) {
-            isAdminLoggedIn = !!user;
-            updateAdminUI(isAdminLoggedIn);
-            if (isAdminLoggedIn) {
-                const modal = document.getElementById('adminLoginModal');
-                if (modal) modal.classList.add('hidden');
-                const bar = document.getElementById('adminBar');
-                if (bar) bar.setAttribute('title', user.email || 'Admin Firebase');
-                showToast('Sesi admin Firebase aktif.');
-            }
-        };
-        if (Object.prototype.hasOwnProperty.call(window, 'pendingFirebaseUser')) {
-            window.syncAdminAuthState(window.pendingFirebaseUser);
-            delete window.pendingFirebaseUser;
+            isAdminLoggedIn = false;
+            updateAdminUI(false);
+            showToast("Logout Berhasil.");
         }
 
         function updateAdminUI(isLogged) {
